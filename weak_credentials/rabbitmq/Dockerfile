@@ -20,4 +20,6 @@ RUN set eux; \
 	rm -rf /var/lib/apt/lists/*; \
 	rabbitmqadmin --version
 
+ENV RABBITMQ_DEFAULT_PASS=root
+
 EXPOSE 15671 15672
