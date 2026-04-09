@@ -45,6 +45,6 @@ cat /tmp/result.textproto | grep -C 10 '\sname: "spark-core"'
 Verify that exploitability_signals are only added to fzf related packages:
 
 ```sh
-/tmp/scalibr -plugins="vex/os-duplicate/dpkg,os/dpkg,java/archive,go/binary" -o textproto=/tmp/result.textproto
+scalibr -plugins="vex/os-duplicate/dpkg,os/dpkg,java/archive,go/binary" -o textproto=/tmp/result.textproto
 cat /tmp/result.textproto | grep -C 10 'exploitability_signals'
 ```
