@@ -1,15 +1,9 @@
-x-common-ven: &common
+x-common: &common
   volumes:
     - ./../scalibr:/usr/bin/scalibr
-  command: ["/bin/sh", "-c", "/usr/bin/verify.sh || cat /tmp/result.textproto"]
-  environment:
-    - DEFAULT_PKG=runc
-    - DEFAULT_PKG_FILE=usr/bin/runc
-    - EXTRA_PKG=gh
-    - EXTRA_PKG_FILE=usr/bin/gh
-    - LANGUAGE_EXTRACTORS=go/binary
-    - OS_EXTRACTOR=os/rpm
-    - DUP_ANNOTATOR=vex/os-duplicate/rpm
+  command: ["/bin/sh", "-c", "/usr/bin/verify.sh || sleep infinity"]
+  env_file:
+    - common.env
 
 services:
   rhel:
@@ -75,12 +69,14 @@ services:
       context: .
       dockerfile_inline: |
         FROM registry.suse.com/bci/bci-base:15.6
-        RUN zypper install -y runc
+        RUN zypper install -y runc awk
         RUN zypper addrepo https://cli.github.com/packages/rpm/gh-cli.repo && \
             zypper --gpg-auto-import-keys refresh && \
             zypper install -y gh
         COPY verify.sh /usr/bin/verify.sh
         RUN chmod +x /usr/bin/verify.sh
+    environment:
+      - DEFAULT_PKG_FILE=usr/sbin/runc
 
   opensuse:
     <<: *common
@@ -95,8 +91,8 @@ services:
             zypper install -y gh
         COPY verify.sh /usr/bin/verify.sh
         RUN chmod +x /usr/bin/verify.sh
-      environment:
-        - DEFAULT_PKG_FILE=usr/bin/runc
+    environment:
+      - DEFAULT_PKG_FILE=usr/sbin/runc
 
   amazonlinux2:
     <<: *common
@@ -105,11 +101,17 @@ services:
       context: .
       dockerfile_inline: |
         FROM amazonlinux:2
-        RUN yum install -y runc yum-utils
-        RUN yum-config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo && \
-            yum install -y gh
+        RUN yum install -y tomcat
+        RUN amazon-linux-extras enable docker && \
+            yum install -y runc
         COPY verify.sh /usr/bin/verify.sh
         RUN chmod +x /usr/bin/verify.sh
+    environment:
+      - DEFAULT_PKG=tomcat
+      - DEFAULT_PKG_FILE=usr/share/java/avalon-framework-api.jar
+      - EXTRA_PKG=runc
+      - EXTRA_PKG_FILE=usr/sbin/runc
+      - LANGUAGE_EXTRACTORS=go/binary,java/archive
 
   amazonlinux2023:
     <<: *common
@@ -124,3 +126,5 @@ services:
             dnf install -y gh
         COPY verify.sh /usr/bin/verify.sh
         RUN chmod +x /usr/bin/verify.sh
+    environment:
+      - DEFAULT_PKG_FILE=usr/sbin/runc

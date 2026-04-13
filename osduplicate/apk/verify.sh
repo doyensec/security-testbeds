@@ -16,10 +16,33 @@ grep -qE "\sname:\s+\"$EXTRA_PKG\"" /tmp/result.textproto || { echo "FAIL: EXTRA
 
 echo "----"
 
+has_exploitability_signals() {
+  local target="$1"
+
+  awk -v tgt="$target" '
+    # We escape the { to treat it as a literal character
+    BEGIN { RS = "packages:[[:space:]]*\\{" }
+
+    $0 ~ tgt && /exploitability_signals/ {
+      found = 1;
+      exit 0
+    }
+    END { exit (found ? 0 : 1) }
+  ' /tmp/result.textproto
+}
+
+
 # Verify that exploitability_signals are only added to default pkg related packages:
 
 scalibr -plugins="$OS_EXTRACTOR,$DUP_ANNOTATOR,$LANGUAGE_EXTRACTORS" -o textproto=/tmp/result.textproto
-cat /tmp/result.textproto | grep -B 5 'exploitability_signals' | grep -qv "$EXTRA_PKG_FILE" || { echo "FAIL: exploitability_signals added to inventory found inside the EXTRA_PKG_FILE: $EXTRA_PKG_FILE"; exit 1; }
-cat /tmp/result.textproto | grep -B 5 'exploitability_signals' | grep -q "$DEFAULT_PKG_FILE" || { echo "FAIL: no exploitability_signals added to inventory found inside the DEFAULT_PKG_FILE: $DEFAULT_PKG_FILE"; exit 1; }
+if ! has_exploitability_signals "$DEFAULT_PKG_FILE"; then
+  echo "FAIL: exploitability_signals missing from $DEFAULT_PKG_FILE" >&2
+  exit 1
+fi
+if has_exploitability_signals "$EXTRA_PKG_FILE"; then
+  echo "FAIL: exploitability_signals unexpectedly found in $EXTRA_PKG_FILE" >&2
+  exit 1
+fi
+
 
 echo "--- All Tests Passed ---"
