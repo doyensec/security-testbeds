@@ -11,5 +11,11 @@ The docker-compose contains multiple docker images which install a pkg from a de
 Build the image and run the testbed:
 
 ```sh
-docker compose build
+docker compose up --build
+```
+
+For manual verification launch:
+
+```sh
+docker compose run amazonlinux2 bash
 ```
