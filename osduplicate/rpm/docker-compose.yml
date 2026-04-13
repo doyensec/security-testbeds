@@ -1,0 +1,126 @@
+x-common-ven: &common
+  volumes:
+    - ./../scalibr:/usr/bin/scalibr
+  command: ["/bin/sh", "-c", "/usr/bin/verify.sh || cat /tmp/result.textproto"]
+  environment:
+    - DEFAULT_PKG=runc
+    - DEFAULT_PKG_FILE=usr/bin/runc
+    - EXTRA_PKG=gh
+    - EXTRA_PKG_FILE=usr/bin/gh
+    - LANGUAGE_EXTRACTORS=go/binary
+    - OS_EXTRACTOR=os/rpm
+    - DUP_ANNOTATOR=vex/os-duplicate/rpm
+
+services:
+  rhel:
+    <<: *common
+    image: osduplicate-rpm-rhel
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM registry.access.redhat.com/ubi9/ubi:latest
+        RUN dnf install -y runc
+        RUN dnf install -y 'dnf-command(config-manager)' && \
+            dnf config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo && \
+            dnf install -y gh
+        COPY verify.sh /usr/bin/verify.sh
+        RUN chmod +x /usr/bin/verify.sh
+
+  centos:
+    <<: *common
+    image: osduplicate-rpm-centos
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM quay.io/centos/centos:stream9
+        RUN dnf install -y runc
+        RUN dnf install -y 'dnf-command(config-manager)' && \
+            dnf config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo && \
+            dnf install -y gh
+        COPY verify.sh /usr/bin/verify.sh
+        RUN chmod +x /usr/bin/verify.sh
+
+  almalinux:
+    <<: *common
+    image: osduplicate-rpm-almalinux
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM almalinux:9
+        RUN dnf install -y runc
+        RUN dnf install -y 'dnf-command(config-manager)' && \
+            dnf config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo && \
+            dnf install -y gh
+        COPY verify.sh /usr/bin/verify.sh
+        RUN chmod +x /usr/bin/verify.sh
+
+  rockylinux:
+    <<: *common
+    image: osduplicate-rpm-rockylinux
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM rockylinux:9
+        RUN dnf install -y runc
+        RUN dnf install -y 'dnf-command(config-manager)' && \
+            dnf config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo && \
+            dnf install -y gh
+        COPY verify.sh /usr/bin/verify.sh
+        RUN chmod +x /usr/bin/verify.sh
+
+  sles:
+    <<: *common
+    image: osduplicate-rpm-sles
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM registry.suse.com/bci/bci-base:15.6
+        RUN zypper install -y runc
+        RUN zypper addrepo https://cli.github.com/packages/rpm/gh-cli.repo && \
+            zypper --gpg-auto-import-keys refresh && \
+            zypper install -y gh
+        COPY verify.sh /usr/bin/verify.sh
+        RUN chmod +x /usr/bin/verify.sh
+
+  opensuse:
+    <<: *common
+    image: osduplicate-rpm-opensuse
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM opensuse/leap:15.6
+        RUN zypper install -y runc
+        RUN zypper addrepo https://cli.github.com/packages/rpm/gh-cli.repo && \
+            zypper --gpg-auto-import-keys refresh && \
+            zypper install -y gh
+        COPY verify.sh /usr/bin/verify.sh
+        RUN chmod +x /usr/bin/verify.sh
+      environment:
+        - DEFAULT_PKG_FILE=usr/bin/runc
+
+  amazonlinux2:
+    <<: *common
+    image: osduplicate-rpm-amazonlinux2
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM amazonlinux:2
+        RUN yum install -y runc yum-utils
+        RUN yum-config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo && \
+            yum install -y gh
+        COPY verify.sh /usr/bin/verify.sh
+        RUN chmod +x /usr/bin/verify.sh
+
+  amazonlinux2023:
+    <<: *common
+    image: osduplicate-rpm-amazonlinux2023
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM amazonlinux:2023
+        RUN dnf install -y runc
+        RUN dnf install -y 'dnf-command(config-manager)' && \
+            dnf config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo && \
+            dnf install -y gh
+        COPY verify.sh /usr/bin/verify.sh
+        RUN chmod +x /usr/bin/verify.sh
