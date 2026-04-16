@@ -1,6 +1,6 @@
 x-common: &common
   volumes:
-    - ./../scalibr:/usr/bin/scalibr
+    - /tmp/scalibr:/usr/bin/scalibr
   command: ["/bin/sh", "-c", "/usr/bin/verify.sh || sleep infinity"]
   env_file:
     - common.env
@@ -10,7 +10,7 @@ services:
     <<: *common
     image: osduplicate-rpm-rhel
     build:
-      context: .
+      context: ..
       dockerfile_inline: |
         FROM registry.access.redhat.com/ubi9/ubi:latest
         RUN dnf install -y runc
@@ -24,7 +24,7 @@ services:
     <<: *common
     image: osduplicate-rpm-centos
     build:
-      context: .
+      context: ..
       dockerfile_inline: |
         FROM quay.io/centos/centos:stream9
         RUN dnf install -y runc
@@ -38,7 +38,7 @@ services:
     <<: *common
     image: osduplicate-rpm-almalinux
     build:
-      context: .
+      context: ..
       dockerfile_inline: |
         FROM almalinux:9
         RUN dnf install -y runc
@@ -52,7 +52,7 @@ services:
     <<: *common
     image: osduplicate-rpm-rockylinux
     build:
-      context: .
+      context: ..
       dockerfile_inline: |
         FROM rockylinux:9
         RUN dnf install -y runc
@@ -66,7 +66,7 @@ services:
     <<: *common
     image: osduplicate-rpm-sles
     build:
-      context: .
+      context: ..
       dockerfile_inline: |
         FROM registry.suse.com/bci/bci-base:15.6
         RUN zypper install -y runc awk
@@ -82,7 +82,7 @@ services:
     <<: *common
     image: osduplicate-rpm-opensuse
     build:
-      context: .
+      context: ..
       dockerfile_inline: |
         FROM opensuse/leap:15.6
         RUN zypper install -y runc
@@ -98,7 +98,7 @@ services:
     <<: *common
     image: osduplicate-rpm-amazonlinux2
     build:
-      context: .
+      context: ..
       dockerfile_inline: |
         FROM amazonlinux:2
         RUN yum install -y tomcat
@@ -117,7 +117,7 @@ services:
     <<: *common
     image: osduplicate-rpm-amazonlinux2023
     build:
-      context: .
+      context: ..
       dockerfile_inline: |
         FROM amazonlinux:2023
         RUN dnf install -y runc

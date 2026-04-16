@@ -14,13 +14,13 @@ In this example the `Dockerfile` installs:
 Build the image and run the testbed:
 
 ```sh
-docker build --platform linux/amd64 -t osduplicate-dpkg .
-docker run --rm -it --platform linux/amd64 -v ./../scalibr:/usr/bin/scalibr osduplicate-dpkg /usr/bin/verify.sh
+docker build --platform linux/amd64 -t osduplicate-dpkg -f Dockerfile ..
+docker run --rm -it --platform linux/amd64 -v /tmp/scalibr:/usr/bin/scalibr osduplicate-dpkg /usr/bin/verify.sh
 ```
 
 For manual verification launch:
 
 ```sh
-docker build --platform linux/amd64 -t osduplicate-dpkg .
-docker run --rm -it --platform linux/amd64 -v ./../scalibr:/usr/bin/scalibr osduplicate-dpkg
+docker build --platform linux/amd64 -t osduplicate-dpkg -f Dockerfile ..
+docker run --rm -it --platform linux/amd64 -v /tmp/scalibr:/usr/bin/scalibr osduplicate-dpkg
 ```
