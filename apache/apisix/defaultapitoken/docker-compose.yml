@@ -1,15 +1,26 @@
 services:
-  apache-apisix-defaul-api-token:
-    image: apache/apisix:2.11.0-alpine
+  apache-apisix-default-api-token:
+    image: apache/apisix:2.13.0-alpine
+    platform: linux/amd64
     restart: unless-stopped
     ports:
-      - "9080:9080"
+      - "8081:9080"
     volumes:
       - ./config_default.yml:/usr/local/apisix/conf/config.yaml:ro
     depends_on:
       - etcd
+  apache-apisix-default-api-token-safe:
+    image: apache/apisix:2.13.0-alpine
+    platform: linux/amd64
+    restart: unless-stopped
+    ports:
+      - "8082:9080"
+    volumes:
+      - ./config_api_key_change.yml:/usr/local/apisix/conf/config.yaml:ro
+    depends_on:
+      - etcd
   etcd:
-    image: bitnami/etcd:3.4.15
+    image: bitnamilegacy/etcd:3.4.15
     environment:
       ETCD_ENABLE_V2: "true"
       ALLOW_NONE_AUTHENTICATION: "yes"
