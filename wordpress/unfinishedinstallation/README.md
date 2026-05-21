@@ -14,3 +14,9 @@ and the following storage:
 -   `pre-setup-wp-pv-claim`: File system required by WordPress.
 
 Replace `${db_password}` with a password of your choice in wordpress.yaml
+
+
+You can also use the docker-compose setup with 
+```
+docker compose up
+```
