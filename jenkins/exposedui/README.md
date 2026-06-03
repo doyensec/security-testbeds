@@ -2,6 +2,8 @@
 
 This testbed creates two Jenkins 2.562 instances, one with the setup wizard disabled and anyone allowed to do anything (http://localhost:8081/), and one with default config (http://localhost:8082/).
 
+The default config, with the setup screen, requires a password which is output to the terminal on first boot, and allows configuring authentication during setup (or makes a default admin user with the same password).
+
 ## Confirming the vulnerability
 
 ```
