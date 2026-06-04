@@ -1,7 +1,7 @@
 # WordPress with exposed installation page
 
 This directory contains the deployment configs for a WordPress application where
-the installation page is exposed. The service listens on port `80`.
+the installation page is exposed. The internal service listens on port `80` and is exposed on `8081` by docker compose.
 
 This config deploys the following services:
 
