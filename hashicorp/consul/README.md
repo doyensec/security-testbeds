@@ -15,7 +15,7 @@ curl -H 'Content-Type: application/json' -X PUT \
     -d '{
         "Name": "test",
         "check": {
-            "Args": ["sh", "-c", "curl curl <your_host_here>"],
+            "Args": ["sh", "-c", "curl <your_host_here>"],
             "interval": "10s",
             "Timeout": "600s"
         }
