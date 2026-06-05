@@ -17,7 +17,7 @@ curl -H 'Content-Type: application/json' -X PUT \
         "check": {
             "Args": ["sh", "-c", "curl <your_host_here>"],
             "interval": "10s",
-            "Timeout": "600s"
+            "timeout": "600s"
         }
     }' localhost:8081/v1/agent/service/register
 ```
