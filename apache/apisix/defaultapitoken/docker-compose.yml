@@ -1,5 +1,5 @@
 services:
-  apache-apisix-default-api-token:
+  apache-apisix-default-api-token-vuln:
     image: apache/apisix:2.13.0-alpine
     platform: linux/amd64
     restart: unless-stopped
@@ -8,7 +8,12 @@ services:
     volumes:
       - ./config_default.yml:/usr/local/apisix/conf/config.yaml:ro
     depends_on:
-      - etcd
+      etcd-vuln:
+        condition: service_healthy
+    networks:
+      vuln:
+        aliases: 
+          - apisix
   apache-apisix-default-api-token-safe:
     image: apache/apisix:2.13.0-alpine
     platform: linux/amd64
@@ -18,11 +23,46 @@ services:
     volumes:
       - ./config_api_key_change.yml:/usr/local/apisix/conf/config.yaml:ro
     depends_on:
-      - etcd
-  etcd:
+      etcd-safe:
+        condition: service_healthy
+    networks:
+      safe:
+        aliases: 
+          - apisix
+  etcd-vuln:
     image: bitnamilegacy/etcd:3.4.15
     environment:
       ETCD_ENABLE_V2: "true"
       ALLOW_NONE_AUTHENTICATION: "yes"
       ETCD_ADVERTISE_CLIENT_URLS: "http://0.0.0.0:2379"
       ETCD_LISTEN_CLIENT_URLS: "http://0.0.0.0:2379"
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:2379/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      vuln:
+        aliases: 
+          - etcd
+  etcd-safe:
+    image: bitnamilegacy/etcd:3.4.15
+    environment:
+      ETCD_ENABLE_V2: "true"
+      ALLOW_NONE_AUTHENTICATION: "yes"
+      ETCD_ADVERTISE_CLIENT_URLS: "http://0.0.0.0:2379"
+      ETCD_LISTEN_CLIENT_URLS: "http://0.0.0.0:2379"
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:2379/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      safe:
+        aliases: 
+          - etcd
+networks:
+  safe:
+    driver: bridge
+  vuln:
+    driver: bridge
