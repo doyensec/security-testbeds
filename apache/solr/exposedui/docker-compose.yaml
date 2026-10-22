@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  # =========================================================================
+  # VULNERABLE SERVICE
+  # Uses version 8.11.2 of Solr configured without auth
+  # =========================================================================
+  solr-vulnerable:
+    image: solr:8.11.2
+    container_name: solr_exposedui_vulnerable
+    ports:
+      - "8081:8983"
+    environment:
+      - SOLR_JAVA_MEM=-Xms512m -Xmx512m
+    command: >
+      bash -c "
+        solr start -c -p 8983 &&
+        while ! curl -s http://localhost:8983/solr/admin/info/system > /dev/null; do sleep 1; done &&
+        solr create -c configuredcore || true
+        tail -f /dev/null
+      "
+    restart: unless-stopped
+
+  # =========================================================================
+  # AUTH REQUIRED SERVICE
+  # Uses version 8.11.2 of Solr configured with auth
+  # =========================================================================
+  solr-auth:
+    image: solr:8.11.2
+    container_name: solr_exposedui_auth
+    ports:
+      - "8082:8983"
+    environment:
+      - SOLR_JAVA_MEM=-Xms512m -Xmx512m
+    command: >
+      bash -c "
+        solr start -c -p 8983 &&
+        while ! curl -s http://localhost:8983/solr/admin/info/system > /dev/null; do sleep 1; done &&
+        solr create -c configuredcore || true
+        solr auth enable -type basicAuth -credentials myuser:mypassword -block-unknown true -prompt false &&
+        tail -f /dev/null
+      "
+    restart: unless-stopped
