@@ -1,0 +1,114 @@
+version: "2.4"
+
+volumes:
+  deep-vuln: {}
+  deep-patched: {}
+  meta-vuln: {}
+  meta-patched: {}
+
+services:
+  # ============================ VULNERABLE (0.20.0) ============================
+  postgres-vuln:
+    image: postgres:13
+    environment:
+      POSTGRES_PASSWORD: FoolishPassword
+      POSTGRES_USER: druid
+      POSTGRES_DB: druid
+    volumes:
+      - meta-vuln:/var/lib/postgresql/data
+
+  zookeeper-vuln:
+    image: zookeeper:3.5
+    environment:
+      ZOO_MY_ID: 1
+
+  coordinator-vuln:
+    image: apache/druid:0.20.0
+    command: [coordinator]            # runs combined coordinator-overlord
+    env_file: [environment-vuln]
+    depends_on: [zookeeper-vuln, postgres-vuln]
+    volumes:
+      - deep-vuln:/opt/data
+
+  broker-vuln:
+    image: apache/druid:0.20.0
+    command: [broker]
+    env_file: [environment-vuln]
+    depends_on: [zookeeper-vuln, postgres-vuln, coordinator-vuln]
+
+  historical-vuln:
+    image: apache/druid:0.20.0
+    command: [historical]
+    env_file: [environment-vuln]
+    depends_on: [zookeeper-vuln, postgres-vuln, coordinator-vuln]
+    volumes:
+      - deep-vuln:/opt/data
+
+  middlemanager-vuln:
+    image: apache/druid:0.20.0
+    command: [middleManager]
+    env_file: [environment-vuln]
+    depends_on: [zookeeper-vuln, postgres-vuln, coordinator-vuln]
+    volumes:
+      - deep-vuln:/opt/data
+
+  router-vuln:
+    image: apache/druid:0.20.0
+    command: [router]
+    env_file: [environment-vuln]
+    depends_on: [zookeeper-vuln, postgres-vuln, coordinator-vuln]
+    ports:
+      - "8081:8888"                   # vulnerable console + API on host :8081
+
+  # ============================= PATCHED (0.20.1) =============================
+  postgres-patched:
+    image: postgres:13
+    environment:
+      POSTGRES_PASSWORD: FoolishPassword
+      POSTGRES_USER: druid
+      POSTGRES_DB: druid
+    volumes:
+      - meta-patched:/var/lib/postgresql/data
+
+  zookeeper-patched:
+    image: zookeeper:3.5
+    environment:
+      ZOO_MY_ID: 1
+
+  coordinator-patched:
+    image: apache/druid:0.20.1
+    command: [coordinator]
+    env_file: [environment-patched]
+    depends_on: [zookeeper-patched, postgres-patched]
+    volumes:
+      - deep-patched:/opt/data
+
+  broker-patched:
+    image: apache/druid:0.20.1
+    command: [broker]
+    env_file: [environment-patched]
+    depends_on: [zookeeper-patched, postgres-patched, coordinator-patched]
+
+  historical-patched:
+    image: apache/druid:0.20.1
+    command: [historical]
+    env_file: [environment-patched]
+    depends_on: [zookeeper-patched, postgres-patched, coordinator-patched]
+    volumes:
+      - deep-patched:/opt/data
+
+  middlemanager-patched:
+    image: apache/druid:0.20.1
+    command: [middleManager]
+    env_file: [environment-patched]
+    depends_on: [zookeeper-patched, postgres-patched, coordinator-patched]
+    volumes:
+      - deep-patched:/opt/data
+
+  router-patched:
+    image: apache/druid:0.20.1
+    command: [router]
+    env_file: [environment-patched]
+    depends_on: [zookeeper-patched, postgres-patched, coordinator-patched]
+    ports:
+      - "8082:8888"                   # patched console + API on host :8082
